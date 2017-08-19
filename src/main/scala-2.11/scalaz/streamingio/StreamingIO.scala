@@ -37,6 +37,18 @@ sealed trait Process[I, O] {
       case Some(i) if p(i) => Emit(i, Halt())
       case _ => Halt()
     }.repeat
+
+  def take[I](n: Int): Process[I, I] =
+    Await[I, I] {
+      case Some(i) if n > 0 => Emit(i, take[I](n-1))
+      case _ => Halt()
+    }
+
+  def drop[I](n: Int): Process[I, I] =
+    Await[I, I] {
+      case Some(i) if n > 0 => drop[I](n-1)
+    }
+
 }
 
 // head値を出力ストリームに書き出さなければならないことをドライバに合図する
@@ -87,7 +99,5 @@ object StreamingIO extends App {
       }
     go(0.0)
   }
-  val s = sum(Stream(1.0, 2.0, 3.0, 4.0)).toList
-  println(s)
 }
 
