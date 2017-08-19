@@ -6,6 +6,7 @@ scalaVersion := "2.11.8"
 
 libraryDependencies ++= Seq(
   "org.scalatest" %% "scalatest" % "3.0.1" % "test",
-  "org.json4s" % "json4s-jackson_2.10" % "3.1.0"
-  )
+  "org.json4s" % "json4s-jackson_2.10" % "3.1.0",
+  "org.scalaz" %% "scalaz-core" % "7.2.7"
+)
     

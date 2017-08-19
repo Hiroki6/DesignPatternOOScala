@@ -3,6 +3,7 @@ package scalaz.iomonad
 import scalaz.monoids.Monad
 
 case class Player(name: String, score: Int)
+
 sealed trait IO[A] { self =>
   def run: A
   def map[B](f: A => B): IO[B] =
@@ -37,6 +38,7 @@ object IO extends Monad[IO] {
     PrintLine(winnerMsg(winner(p1, p2)))
 
   def ReadLine: IO[String] = IO { readLine }
+
   def fahrenheitToCelsius(f: Double): Double = (f - 32) * 5.0/9.0
 
   def converter: IO[Unit] = for {
@@ -45,5 +47,6 @@ object IO extends Monad[IO] {
     _ <- PrintLine("fahrenheitToCelsius(d).toString")
   } yield ()
 
+  val readInt = ReadLine.map(_.toInt)
 }
 
