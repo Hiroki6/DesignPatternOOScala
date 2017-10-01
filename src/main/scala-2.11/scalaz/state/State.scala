@@ -4,7 +4,16 @@ trait RNG {
   def nextInt: (Int, RNG)
 }
 
-case class SimpleRNG(seed: Long) extends RNG {
+object RNG {
+
+  case class SimpleRNG(seed: Long) extends RNG {
+    def nextInt: (Int, RNG) = {
+      val newSeed = (seed * 0x5DEECE66DL + 0xBL) & 0xFFFFFFFFFFFFL
+      val nextRNG = SimpleRNG(newSeed)
+      val n = (newSeed >>> 16).toInt
+      (n, nextRNG)
+    }
+  }
   type Rand[+A] = RNG => (A, RNG)
 
   val int: Rand[Int] = _.nextInt
@@ -34,18 +43,14 @@ case class SimpleRNG(seed: Long) extends RNG {
   def nonNegativeEven: Rand[Int] =
     map(nonNegativeInt)(i => i - i % 2)
 
+  def boolean(rng: RNG): (Boolean, RNG) = rng.nextInt match { case (i, rng2) => (i%2==0, rng2) }
+
   def both[A, B](ra: Rand[A], rb: Rand[B]): Rand[(A, B)] = map2(ra, rb)((_, _))
 
   val randIntDouble: Rand[(Int, Double)] = both(int, double)
 
   val randDoubleInt: Rand[(Double, Int)] = both(double, int)
 
-  def nextInt: (Int, RNG) = {
-    val newSeed = (seed * 0x5DEECE66DL + 0xBL) & 0xFFFFFFFFFFFFL
-    val nextRNG = SimpleRNG(newSeed)
-    val n = (newSeed >>> 16).toInt
-    (n, nextRNG)
-  }
 
   /**
     * カリー化
